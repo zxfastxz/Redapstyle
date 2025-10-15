@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>REDAP - Monitoramento em Tempo Real</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-sA+z0p4uHxaV7AoAB7ihCX5KLiAwd7Lx3yR9gA+uHMo="
+    crossorigin=""
+  />
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <h1>REDAP</h1>
+      <p>Sistema de Monitoramento de Alagamentos em Tempo Real</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Mapa -->
+    <div id="map"></div>
+
+    <!-- Painel de Sensores -->
+    <div id="sensor-cards" class="sensor-panel"></div>
+
+    <!-- Alertas -->
+    <div class="logs">
+      <h2>Alertas Registrados</h2>
+      <ul id="log-list">
+        <li>Nenhum alerta até o momento.</li>
+      </ul>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 REDAP | Desenvolvido para monitoramento urbano</p>
+  </footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Script externo -->
+  <script src="script.js"></script>
+</body>
+</html>
