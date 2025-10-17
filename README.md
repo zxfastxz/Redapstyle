@@ -2,7 +2,7 @@
 
 > Sistema interativo para monitoramento de sensores de alagamento, com gráficos históricos, alertas visuais e mapas em tempo real.
 
----
+
 
 ## 🌟 Sobre o projeto
 
@@ -18,7 +18,7 @@ Ele combina:
 
 > Atualmente os dados são **simulados**, mas o sistema está pronto para integração com sensores reais (NodeMCU/ESP + DHT11 + sensor ultrassônico).
 
----
+
 
 ## ⚡ Funcionalidades
 
@@ -43,7 +43,7 @@ Ele combina:
 6. **Filtro por sensor ou bairro**  
    - Facilita visualizar apenas os sensores desejados.
 
----
+
 
 ## 💻 Como usar
 
@@ -60,7 +60,7 @@ Ele combina:
 
 > **Dica:** A simulação aleatória permite testar todos os níveis: Normal, Alerta, Risco e Crítico.
 
----
+
 
 ## 🛠 Tecnologias utilizadas
 
@@ -70,7 +70,7 @@ Ele combina:
 - **Chart.js** – Gráficos históricos de nível e temperatura.  
 - **CSV Export** – Para download do histórico.
 
----
+
 
 ## 🚀 Próximos passos
 
@@ -81,17 +81,16 @@ Ele combina:
 - Dark mode e tema customizável.  
 - Filtros avançados por sensor, bairro ou intervalo de datas.
 
----
+
 
 ## 👥 Contribuição
 
 Este projeto é open-source. Se você tiver ideias ou melhorias, sinta-se à vontade para abrir **issues** ou enviar **pull requests**.
 
----
+
 
 ## 📄 Licença
 
 REDAP – Sistema desenvolvido para **demonstração educacional**.  
 Não há garantia de precisão para monitoramento real de alagamentos.
 
----
