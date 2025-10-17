@@ -1,0 +1,131 @@
+:root{
+  --bg: #0d1117;
+  --panel: #111417;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --ok: #4caf50;
+  --warn: #ffeb3b;
+  --risk: #ff9800;
+  --crit: #ff4d4d;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: Inter, Roboto, system-ui, sans-serif;
+  background: var(--bg);
+  color: #e6edf3;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* Topbar */
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 20px;
+  border-bottom:1px solid #222428;
+  background: linear-gradient(180deg,#0b0f14, #0d1117);
+}
+.brand h1{margin:0;color:var(--accent);font-size:1.4rem}
+.brand small{color:var(--muted);display:block;margin-top:4px}
+.top-actions button{margin-left:6px}
+
+/* layout */
+.layout{display:flex;gap:20px;padding:20px;align-items:flex-start}
+
+/* left column */
+.left-col{flex:2; min-width:300px}
+.map-card{
+  background:var(--panel);
+  padding:12px;
+  border-radius:10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+  margin-bottom:14px;
+}
+.map-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+#map{width:100%;height:420px;border-radius:8px}
+
+/* cards row */
+.cards-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.card{
+  background:#0f1418;padding:10px;border-radius:8px;min-width:170px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  text-align:center;
+  position:relative;
+}
+.card strong{display:block;color:var(--muted);margin-bottom:6px}
+.card .value{font-weight:700;font-size:1.15rem}
+
+/* status legendas cores */
+.status-normal{color:var(--ok)}
+.status-alerta{color:var(--warn)}
+.status-risco{color:var(--risk)}
+.status-situacaocritica{color:var(--crit);font-weight:700;}
+
+/* oscilação para destaque crítico */
+.oscillate{
+  animation: pulse 1s infinite;
+}
+@keyframes pulse{
+  0%, 100%{opacity:1; transform: scale(1);}
+  50%{opacity:0.6; transform: scale(1.05);}
+}
+
+/* history card */
+.history-card{
+  background:var(--panel); padding:12px;border-radius:10px; margin-bottom:12px;
+}
+.charts{display:flex;gap:12px;flex-wrap:wrap}
+canvas{background:#0f1418;border-radius:8px;padding:8px}
+
+/* right column */
+.right-col{flex:1;min-width:260px;display:flex;flex-direction:column;gap:12px}
+.indicators, .waze-card, .credits{
+  background:var(--panel); padding:12px;border-radius:10px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.45);
+}
+.ind-list .ind-item{margin-bottom:8px;color:var(--muted)}
+.waze-card iframe{width:100%;height:500px;border-radius:6px;border:0}
+
+/* alert banner */
+.alert-banner{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:18px;
+  background:rgba(255,77,77,0.12);border:1px solid rgba(255,77,77,0.25);
+  padding:10px 16px;border-radius:8px;color:var(--crit);display:flex;gap:12px;align-items:center;
+  z-index:999;
+}
+.hidden{display:none}
+
+/* footer */
+.footer{padding:12px;text-align:center;color:var(--muted);border-top:1px solid #15171a;margin-top:18px}
+
+/* buttons */
+.btn{background:#238636;color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;transition:0.2s}
+.btn:hover{opacity:0.85}
+.btn.tiny{padding:6px 8px;font-size:0.85rem;border-radius:6px}
+.btn.small{padding:6px 10px;font-size:0.9rem;border-radius:8px}
+
+/* filtro select */
+select{padding:6px 8px;border-radius:6px;background:#0f1418;color:#e6edf3;border:none;margin-bottom:12px;cursor:pointer}
+
+/* legendas */
+.legend{
+  display:flex;gap:12px;margin-top:6px;flex-wrap:wrap;
+}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:0.85rem}
+.legend-color{width:12px;height:12px;border-radius:50%;display:inline-block}
+
+/* status legendas cores */
+.legend-normal .legend-color{background:var(--ok)}
+.legend-alerta .legend-color{background:var(--warn)}
+.legend-risco .legend-color{background:var(--risk)}
+.legend-situacaocritica .legend-color{background:var(--crit)}
+
+/* responsive */
+@media (max-width:1000px){
+  .layout{flex-direction:column;padding:12px}
+  .waze-card iframe{height:380px}
+  .charts{flex-direction:column}
+}

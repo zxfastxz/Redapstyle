@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>REDAP - Painel Profissional</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <h1>REDAP</h1>
+      <small>Sistema de Monitoramento de Alagamentos</small>
+    </div>
+    <div class="top-actions">
+      <button id="btnStart" class="btn small">▶ Iniciar Simulação</button>
+      <button id="btnExport" class="btn small">Exportar CSV</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- LEFT: mapa + cards -->
+    <section class="left-col">
+      <div class="map-card">
+        <div class="map-header">
+          <h2>Mapa de Sensores</h2>
+          <div class="map-controls">
+            <button id="btnFitAll" class="btn tiny">Mostrar todos</button>
+          </div>
+        </div>
+        <div id="map" aria-label="Mapa REDAP"></div>
+      </div>
+
+      <div class="cards-row" id="cardsRow">
+        <!-- cards são gerados dinamicamente -->
+      </div>
+
+      <div class="history-card">
+        <h3>Histórico — Sensor: <span id="selectedName">Nenhum</span></h3>
+        <div class="charts">
+          <canvas id="chartNivel" width="400" height="180"></canvas>
+          <canvas id="chartTemp" width="400" height="180"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Waze + indicators -->
+    <aside class="right-col">
+      <div class="indicators">
+        <h3>Painel de Indicadores</h3>
+        <div class="ind-list">
+          <div class="ind-item"><strong>Última atualização:</strong> <span id="lastUpdate">--:--:--</span></div>
+          <div class="ind-item"><strong>Sensores ativos:</strong> <span id="activeSensors">0</span></div>
+          <div class="ind-item"><strong>Alerta geral:</strong> <span id="globalAlert">Normal</span></div>
+        </div>
+      </div>
+
+      <div class="waze-card">
+        <h3>Trânsito (Waze)</h3>
+        <iframe id="wazeFrame"
+          src="https://embed.waze.com/iframe?zoom=12&lat=-8.0476&lon=-34.8770&color=dark"
+          frameborder="0" allowfullscreen></iframe>
+      </div>
+
+      <div class="credits">
+        <p>REDAP 2025</p>
+      </div>
+    </aside>
+  </main>
+
+  <div id="alertBanner" class="alert-banner hidden">
+    <strong>⚠️ Situação Crítica:</strong> Um ou mais sensores em nível crítico!
+    <button id="ackAlert" class="btn tiny">Anotar</button>
+  </div>
+
+  <footer class="footer">
+    <small>REDAP • Dados simulados • Desenvolvido para demonstração</small>
+  </footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- App JS -->
+  <script src="script.js"></script>
+</body>
+</html>
