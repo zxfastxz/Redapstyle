@@ -4,7 +4,7 @@
 
 
 
-## 🌟 Sobre o projeto
+##  Sobre o projeto
 
 O **REDAP** é um dashboard moderno e intuitivo desenvolvido para monitorar níveis de água em diferentes locais da cidade. Ideal para equipes de gestão urbana, defesa civil ou qualquer pessoa interessada em acompanhar dados de alagamentos.
 
@@ -20,7 +20,7 @@ Ele combina:
 
 
 
-## ⚡ Funcionalidades
+##  Funcionalidades
 
 1. **Simulação automática de dados**  
    - Atualizações a cada 10 segundos.  
@@ -45,7 +45,7 @@ Ele combina:
 
 
 
-## 💻 Como usar
+##  Como usar
 
 1. Clone este repositório ou baixe os arquivos:  
    - `index.html`  
@@ -62,7 +62,7 @@ Ele combina:
 
 
 
-## 🛠 Tecnologias utilizadas
+##  Tecnologias utilizadas
 
 - **HTML5 / CSS3** – Estrutura e layout responsivo.  
 - **JavaScript** – Lógica de simulação e atualização dinâmica.  
@@ -72,7 +72,7 @@ Ele combina:
 
 
 
-## 🚀 Próximos passos
+##  Próximos passos
 
 - Conectar sensores reais via **NodeMCU/ESP + DHT11 + ultrassônico** usando MQTT ou HTTP.  
 - Adicionar **alertas sonoros e notificações push**.  
@@ -83,13 +83,13 @@ Ele combina:
 
 
 
-## 👥 Contribuição
+##  Contribuição
 
 Este projeto é open-source. Se você tiver ideias ou melhorias, sinta-se à vontade para abrir **issues** ou enviar **pull requests**.
 
 
 
-## 📄 Licença
+##  Licença
 
 REDAP – Sistema desenvolvido para **demonstração educacional**.  
 Não há garantia de precisão para monitoramento real de alagamentos.
