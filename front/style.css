@@ -1,0 +1,146 @@
+:root {
+  --bg: #0d1117;
+  --panel: #111417;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --ok: #4caf50;
+  --warn: #ffeb3b;
+  --risk: #ff9800;
+  --crit: #ff4d4d;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: #e6edf3;
+}
+
+/* Layout */
+.layout {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  flex-wrap: wrap;
+}
+.left-col {
+  flex: 2;
+  min-width: 300px;
+}
+.right-col {
+  flex: 1;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Topbar */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: linear-gradient(180deg, #0b0f14, #0d1117);
+  border-bottom: 1px solid #222;
+}
+.brand h1 {
+  margin: 0;
+  color: var(--accent);
+}
+.brand small {
+  color: var(--muted);
+}
+.btn {
+  background: #238636;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Mapa */
+.map-card {
+  background: var(--panel);
+  padding: 12px;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+  margin-bottom: 14px;
+}
+#map {
+  width: 100%;
+  height: 420px;
+  border-radius: 8px;
+}
+
+/* Cards e indicadores */
+.cards-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+.card {
+  background: #0f1418;
+  padding: 10px;
+  border-radius: 8px;
+  min-width: 160px;
+  text-align: center;
+}
+.status-situacaocritica {
+  color: var(--crit);
+  animation: piscar 1s infinite;
+}
+.ind-list .ind-item {
+  margin-bottom: 8px;
+  color: var(--muted);
+}
+.legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.legend-normal .legend-color { background: var(--ok); }
+.legend-alerta .legend-color { background: var(--warn); }
+.legend-risco .legend-color { background: var(--risk); }
+.legend-situacaocritica .legend-color { background: var(--crit); }
+
+/* Banner alerta */
+.alert-banner {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 77, 77, 0.12);
+  border: 1px solid rgba(255, 77, 77, 0.25);
+  padding: 10px 16px;
+  border-radius: 8px;
+  color: var(--crit);
+  z-index: 999;
+}
+.hidden { display: none; }
+
+@keyframes piscar {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Custom icon */
+.custom-bus-icon svg {
+  color: #58a6ff;
+  width: 30px;
+  height: 30px;
+  filter: drop-shadow(0 0 2px rgba(0,0,0,0.6));
+}

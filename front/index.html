@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard de Monitoramento</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand">
+      <h1>Monitoramento Urbano</h1>
+      <small>Simulação em Tempo Real</small>
+    </div>
+    <div class="top-actions">
+      <button id="startSim" class="btn small">▶️ Iniciar Simulação</button>
+      <button id="exportCsv" class="btn small">📄 Exportar CSV</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="left-col">
+      <div class="map-card">
+        <div class="map-header">
+          <h2>Mapa de Monitoramento</h2>
+          <select id="bairroFilter">
+            <option value="todos">Todos os bairros</option>
+            <option value="boa_viagem">Boa Viagem</option>
+            <option value="santo_amaro">Santo Amaro</option>
+            <option value="iputinga">Iputinga</option>
+          </select>
+        </div>
+        <div id="map"></div>
+      </div>
+
+      <div class="cards-row" id="cardsRow"></div>
+
+      <div class="history-card">
+        <h3>Histórico de Dados</h3>
+        <div class="charts">
+          <canvas id="chart1"></canvas>
+          <canvas id="chart2"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-col">
+      <div class="indicators">
+        <h3>Indicadores</h3>
+        <div class="ind-list" id="indicatorsList"></div>
+        <div class="legend">
+          <div class="legend-item legend-normal"><span class="legend-color"></span>Normal</div>
+          <div class="legend-item legend-alerta"><span class="legend-color"></span>Alerta</div>
+          <div class="legend-item legend-risco"><span class="legend-color"></span>Risco</div>
+          <div class="legend-item legend-situacaocritica"><span class="legend-color"></span>Situação Crítica</div>
+        </div>
+      </div>
+      <div class="credits">
+        <small>Atualizado automaticamente a cada 10 segundos</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert-banner hidden" id="alertBanner">
+    ⚠️ Situação Crítica detectada!
+  </div>
+
+  <div class="footer">
+    &copy; 2025 Projeto de Monitoramento Urbano
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
