@@ -1,104 +1,70 @@
-import React from 'react';
-import { Card } from './ui/card';
-import { Droplets, TrendingUp, TrendingDown, Activity, Clock } from 'lucide-react';
-import type { Sensor } from '../App';
+REDAP – Painel Profissional de Monitoramento de Alagamentos
+Sistema interativo para monitoramento de sensores de alagamento, com gráficos históricos, alertas visuais e mapas em tempo real.
 
-interface StatisticsProps {
-  sensores: Sensor[];
-  ultimaAtualizacao: Date;
-  simulacaoAtiva: boolean;
-}
+Sobre o projeto
+O REDAP é um dashboard moderno e intuitivo desenvolvido para monitorar níveis de água em diferentes locais da cidade. Ideal para equipes de gestão urbana, defesa civil ou qualquer pessoa interessada em acompanhar dados de alagamentos.
 
-export function Statistics({ sensores, ultimaAtualizacao, simulacaoAtiva }: StatisticsProps) {
-  if (sensores.length === 0) {
-    return (
-      <Card className="bg-gray-900 border-gray-800 p-8 text-center">
-        <p className="text-gray-400">Nenhum dado disponível</p>
-        <p className="text-sm text-gray-500 mt-2">Aguardando inicialização dos sensores...</p>
-      </Card>
-    );
-  }
+Ele combina:
 
-  const mediaAgua = sensores.reduce((acc, s) => acc + s.nivelAgua, 0) / sensores.length;
-  const mediaTemp = sensores.reduce((acc, s) => acc + s.temperatura, 0) / sensores.length;
-  const mediaUmidade = sensores.reduce((acc, s) => acc + s.umidade, 0) / sensores.length;
-  
-  const maxAgua = Math.max(...sensores.map(s => s.nivelAgua));
-  const minAgua = Math.min(...sensores.map(s => s.nivelAgua));
+Mapa interativo com todos os sensores.
+Cards informativos mostrando temperatura, umidade, nível da água e status.
+Gráficos históricos de nível e temperatura atualizados dinamicamente.
+Indicadores globais e alertas críticos destacados com efeitos visuais.
+Integração com trânsito (Waze) para planejamento de rotas seguras.
+Atualmente os dados são simulados, mas o sistema está pronto para integração com sensores reais (NodeMCU/ESP + DHT11 + sensor ultrassônico).
 
-  return (
-    <div className="space-y-6">
-      {/* Status de Atualização */}
-      <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700 p-5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-full ${simulacaoAtiva ? 'bg-green-950 animate-pulse' : 'bg-gray-800'}`}>
-              <Activity className={`w-5 h-5 ${simulacaoAtiva ? 'text-green-400' : 'text-gray-500'}`} />
-            </div>
-            <div>
-              <p className="text-sm text-gray-400">Status do Sistema</p>
-              <p className="text-gray-100">
-                {simulacaoAtiva ? 'Monitoramento Ativo' : 'Monitoramento Pausado'}
-              </p>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-sm text-gray-400 flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              Última atualização
-            </p>
-            <p className="text-gray-100">
-              {ultimaAtualizacao.toLocaleTimeString('pt-BR')}
-            </p>
-          </div>
-        </div>
-      </Card>
+Funcionalidades
+Simulação automática de dados
 
-      {/* Estatísticas Principais */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-gray-900 border-gray-800 p-5 hover:border-gray-700 transition-all">
-          <div className="flex items-start justify-between mb-3">
-            <div className="p-3 bg-blue-950 rounded-lg">
-              <Droplets className="w-6 h-6 text-blue-400" />
-            </div>
-            <TrendingUp className="w-4 h-4 text-green-400" />
-          </div>
-          <p className="text-sm text-gray-400 mb-1">Nível Médio de Água</p>
-          <p className="text-gray-100">{mediaAgua.toFixed(1)} cm</p>
-          <p className="text-xs text-gray-500 mt-2">
-            Min: {minAgua.toFixed(1)} cm • Max: {maxAgua.toFixed(1)} cm
-          </p>
-        </Card>
+Atualizações a cada 10 segundos.
+Status crítico destacado com animação de oscilação para chamar atenção.
+Mapas interativos
 
-        <Card className="bg-gray-900 border-gray-800 p-5 hover:border-gray-700 transition-all">
-          <div className="flex items-start justify-between mb-3">
-            <div className="p-3 bg-orange-950 rounded-lg">
-              <Activity className="w-6 h-6 text-orange-400" />
-            </div>
-            <TrendingUp className="w-4 h-4 text-orange-400" />
-          </div>
-          <p className="text-sm text-gray-400 mb-1">Temperatura Média</p>
-          <p className="text-gray-100">{mediaTemp.toFixed(1)}°C</p>
-          <p className="text-xs text-gray-500 mt-2">
-            Variação térmica monitorada
-          </p>
-        </Card>
+Marcadores coloridos de acordo com o status: Normal, Alerta, Risco ou Crítico.
+Centralização em um sensor específico com clique no botão correspondente.
+Gráficos históricos
 
-        <Card className="bg-gray-900 border-gray-800 p-5 hover:border-gray-700 transition-all">
-          <div className="flex items-start justify-between mb-3">
-            <div className="p-3 bg-cyan-950 rounded-lg">
-              <Droplets className="w-6 h-6 text-cyan-400" />
-            </div>
-            <TrendingDown className="w-4 h-4 text-cyan-400" />
-          </div>
-          <p className="text-sm text-gray-400 mb-1">Umidade Média</p>
-          <p className="text-gray-100">{mediaUmidade.toFixed(1)}%</p>
-          <p className="text-xs text-gray-500 mt-2">
-            Condições atmosféricas
-          </p>
-        </Card>
-      </div>
-    </div>
-  );
-}
+Linha do tempo de nível da água e temperatura.
+Atualizam automaticamente conforme os dados simulados chegam.
+Alertas visuais
 
+Banner “⚠️ Situação Crítica” quando algum sensor ultrapassa o limite crítico.
+Exportação de histórico (CSV)
+
+Permite baixar os dados para análise offline.
+Filtro por sensor ou bairro
+
+Facilita visualizar apenas os sensores desejados.
+Como usar
+Clone este repositório ou baixe os arquivos:
+
+index.html
+script.js
+style.css
+Abra o index.html em qualquer navegador moderno.
+
+Clique em ▶ Iniciar Simulação para começar a ver os dados sendo atualizados a cada 10 segundos.
+
+Caso algum sensor atinja o nível crítico, o alerta visual será exibido automaticamente.
+
+Dica: A simulação aleatória permite testar todos os níveis: Normal, Alerta, Risco e Crítico.
+
+Tecnologias utilizadas
+HTML5 / CSS3 – Estrutura e layout responsivo.
+JavaScript – Lógica de simulação e atualização dinâmica.
+Leaflet.js – Mapas interativos.
+Chart.js – Gráficos históricos de nível e temperatura.
+CSV Export – Para download do histórico.
+Próximos passos
+Conectar sensores reais via NodeMCU/ESP + DHT11 + ultrassônico usando MQTT ou HTTP.
+Adicionar alertas sonoros e notificações push.
+Dashboard multi-tela (wallboard) para monitoramento em tempo real.
+Histórico visual no mapa, mostrando trajetórias de alertas críticos.
+Dark mode e tema customizável.
+Filtros avançados por sensor, bairro ou intervalo de datas.
+Contribuição
+Este projeto é open-source. Se você tiver ideias ou melhorias, sinta-se à vontade para abrir issues ou enviar pull requests.
+
+Licença
+REDAP – Sistema desenvolvido para demonstração educacional.
+Não há garantia de precisão para monitoramento real de alagamentos.
