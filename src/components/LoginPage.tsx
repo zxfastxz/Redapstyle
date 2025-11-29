@@ -97,16 +97,7 @@ export function LoginPage({ onLogin, onBack }: LoginPageProps) {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-
-            {/* Demo Credentials Info */}
-            <div className="bg-blue-900/20 border border-blue-800/30 rounded-lg p-3">
-              <p className="text-xs text-blue-300">
-                <strong>Credenciais de demonstração:</strong><br />
-                Usuário: <code className="bg-blue-900/30 px-1 rounded">admin</code> | 
-                Senha: <code className="bg-blue-900/30 px-1 rounded">admin123</code>
-              </p>
-            </div>
-
+            
             {/* Submit Button */}
             <Button
               type="submit"
