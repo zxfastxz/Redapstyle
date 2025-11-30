@@ -83,7 +83,7 @@ const gerarDadosSimulados = (): Omit<Sensor, 'id' | 'nome' | 'lat' | 'lng' | 'ba
   return { nivelAgua, temperatura, umidade, status };
 };
 
-export function AdminDashboard({ onLogout }: AdminDashboardProps) {
+export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [sensores, setSensores] = useState<Sensor[]>([]);
   const [historico, setHistorico] = useState<HistoricalData[]>([]);
   const [simulacaoAtiva, setSimulacaoAtiva] = useState(false);
