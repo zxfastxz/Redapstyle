@@ -1,14 +1,15 @@
 import React from 'react';
 import { Button } from './ui/button';
-import { Play, Pause, FileDown } from 'lucide-react';
+import { Play, Pause, FileDown, LogOut } from 'lucide-react';
 
 interface TopbarProps {
   simulacaoAtiva: boolean;
   onToggleSimulacao: () => void;
   onExportarCSV: () => void;
+  onLogout: () => void;   // ← ADICIONAR
 }
 
-export function Topbar({ simulacaoAtiva, onToggleSimulacao, onExportarCSV }: TopbarProps) {
+export function Topbar({ simulacaoAtiva, onToggleSimulacao, onExportarCSV, onLogout }: TopbarProps) {
   return (
     <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-b border-gray-700 px-6 py-5 shadow-lg">
       <div className="container mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -39,13 +40,11 @@ export function Topbar({ simulacaoAtiva, onToggleSimulacao, onExportarCSV }: Top
               <>
                 <Pause className="w-4 h-4" />
                 <span className="hidden sm:inline">Parar Simulação</span>
-                <span className="sm:hidden">Parar</span>
               </>
             ) : (
               <>
                 <Play className="w-4 h-4" />
                 <span className="hidden sm:inline">Iniciar Simulação</span>
-                <span className="sm:hidden">Iniciar</span>
               </>
             )}
           </Button>

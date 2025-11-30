@@ -97,9 +97,7 @@ export default function App() {
       }
       return (
         <AdminDashboard 
-          onMfaSuccess={handleMfaSuccess}
-          secret={adminSecret}
-          email={adminEmail}
+          onLogout={handleLogout}
         />
       );
 

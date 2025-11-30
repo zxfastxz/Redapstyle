@@ -177,26 +177,66 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   };
 
   const exportarCSV = () => {
-    const headers = ['Sensor', 'Bairro', 'Nível Água (cm)', 'Temperatura (°C)', 'Umidade (%)', 'Status', 'Data/Hora'];
-    const rows = sensores.map(s => [
-      s.nome,
-      s.bairro,
-      s.nivelAgua.toFixed(1),
-      s.temperatura.toFixed(1),
-      s.umidade.toFixed(1),
-      s.status,
-      new Date().toLocaleString('pt-BR')
-    ]);
-    
-    const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `redap_dados_${Date.now()}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+  const headers = [
+    "Sensor",
+    "Bairro",
+    "Nível de Água (cm)",
+    "Temperatura (°C)",
+    "Umidade (%)",
+    "Status",
+    "Data/Hora"
+  ];
+
+  const formatDate = () => {
+    const d = new Date();
+    return d.toLocaleString("pt-BR", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
+
+  const escape = (value: any) => {
+    if (value == null) return "";
+    const v = String(value);
+    // se tiver ; , " ou quebra de linha → coloca entre aspas
+    if (/[;"\n]/.test(v)) {
+      return `"${v.replace(/"/g, '""')}"`;
+    }
+    return v;
+  };
+
+  const rows = sensores.map(s => [
+    s.nome,
+    s.bairro,
+    s.nivelAgua.toFixed(1),
+    s.temperatura.toFixed(1),
+    s.umidade.toFixed(1),
+    s.status,
+    formatDate(),
+  ]);
+
+  // Montagem com ; e BOM UTF-8 (melhor no Excel)
+  const csvContent =
+    "\uFEFF" +
+    [headers, ...rows]
+      .map(row => row.map(escape).join(";"))
+      .join("\n");
+
+  const blob = new Blob([csvContent], {
+    type: "text/csv;charset=utf-8;",
+  });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `redap_dados_${Date.now()}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
   
   // Aplicar filtros
   let sensoresFiltrados = sensores;
