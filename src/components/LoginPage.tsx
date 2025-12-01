@@ -26,7 +26,7 @@ export function LoginPage({ onLogin, onBack }: LoginPageProps) {
       if (username === 'admin' && password === 'admin123') {
         onLogin();
       } else {
-        setError('Usuário ou senha incorretos. Tente: admin / admin123');
+        setError('Usuário ou senha incorretos. ');
         setLoading(false);
       }
     }, 800);
