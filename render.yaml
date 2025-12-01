@@ -6,20 +6,15 @@ services:
     region: oregon
     plan: free
     buildCommand: npm install && npm run build
-    startCommand: npm install -g serve && serve -s build -l 3000
+    startCommand: npm install -g serve && serve -s dist -l 3000
     envVars:
       - key: VITE_API_URL
-        value: https://redap-backend-flask.onrender.com
-      - key: VITE_TOTP_API_URL
-        value: https://redap-backend-totp.onrender.com
-    routes:
-      - path: /
-        destination: /
+        value: https://redap-backend.onrender.com
     healthCheckPath: /
 
-  # Backend Flask (MongoDB + Sensor API)
+  # Backend Único (Flask + TOTP)
   - type: web
-    name: redap-backend-flask
+    name: redap-backend
     env: python
     region: oregon
     plan: free
@@ -32,22 +27,7 @@ services:
         fromDatabase: 
           name: redap-db
           property: connectionString
-    healthCheckPath: /sensores
-
-  # Backend Node.js (TOTP Validation)
-  - type: web
-    name: redap-backend-totp
-    env: node
-    region: oregon
-    plan: free
-    buildCommand: npm install
-    startCommand: node server.js
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: PORT
-        value: 4000
-    healthCheckPath: /api/validate-totp
+    healthCheckPath: /health
 
 databases:
   - name: redap-db
