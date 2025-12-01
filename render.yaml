@@ -1,0 +1,59 @@
+services:
+  # Frontend React + Vite
+  - type: web
+    name: redap-dashboard-frontend
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm install -g serve && serve -s build -l 3000
+    envVars:
+      - key: VITE_API_URL
+        value: https://redap-backend-flask.onrender.com
+      - key: VITE_TOTP_API_URL
+        value: https://redap-backend-totp.onrender.com
+    routes:
+      - path: /
+        destination: /
+    healthCheckPath: /
+
+  # Backend Flask (MongoDB + Sensor API)
+  - type: web
+    name: redap-backend-flask
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT app:app --workers 2 --timeout 30
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: MONGODB_URI
+        fromDatabase: 
+          name: redap-db
+          property: connectionString
+    healthCheckPath: /sensores
+
+  # Backend Node.js (TOTP Validation)
+  - type: web
+    name: redap-backend-totp
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+    healthCheckPath: /api/validate-totp
+
+databases:
+  - name: redap-db
+    databaseName: redap
+    plan: free
+    region: oregon
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: Allow all
