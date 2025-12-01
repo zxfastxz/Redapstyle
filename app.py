@@ -6,7 +6,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Conexão com MongoDB Atlas
-client = MongoClient("mongodb+srv://JoaoMarcos5:O4cchFDRqZcAfFVA@cluster0.n9ze7e0.mongodb.net/")
+client = MongoClient()
 db = client["redap"]
 colecao = db["sensores"]  # coleção sem vírgulas
 
@@ -47,3 +47,4 @@ def listar_sensores():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False)
+
