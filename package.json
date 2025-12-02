@@ -1,5 +1,5 @@
 {
-      "name": "Dashboard Alagamentos Recife",
+      "name": "dashboard alagamentos recife",
       "version": "0.1.0",
       "private": true,
       "dependencies": {
@@ -58,9 +58,7 @@
             "vite": "6.3.5"
       },
       "scripts": {
-  "dev": "vite",
-  "build": "vite build",
-  "start": "node server.js"
-}
-
+            "dev": "vite",
+            "build": "vite build"
+      }
 }
