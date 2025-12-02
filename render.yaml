@@ -1,0 +1,39 @@
+services:
+  # Frontend React + Vite
+  - type: web
+    name: redap-dashboard-frontend
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm install -g serve && serve -s dist -l 3000
+    envVars:
+      - key: VITE_API_URL
+        value: https://redap-backend.onrender.com
+    healthCheckPath: /
+
+  # Backend Único (Flask + TOTP)
+  - type: web
+    name: redap-backend
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT app:app --workers 2 --timeout 30
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: MONGODB_URI
+        fromDatabase: 
+          name: redap-db
+          property: connectionString
+    healthCheckPath: /health
+
+databases:
+  - name: redap-db
+    databaseName: redap
+    plan: free
+    region: oregon
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: Allow all
