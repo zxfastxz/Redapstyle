@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { HomePage } from './components/HomePage';
 import { LoginPage } from './components/LoginPage';
 import { PublicDashboard } from './components/PublicDashboard';
-import AdminDashboard from './components/AdminDashboard';
+import { AdminDashboard } from './components/AdminDashboard'; // ← CORRIGIDO (named import)
 import { AdminMfaPage } from './components/AdminMfaPage';
 
 // Gera um segredo TOTP compatível com browser (base32, 20 caracteres)
@@ -21,11 +21,12 @@ export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isMfaValidated, setIsMfaValidated] = useState(false);
-  // Substitui authenticator.generateSecret() por função compatível com browser
+
+  // Segredo usado para validação TOTP
   const [adminSecret] = useState(() => generateBrowserTotpSecret());
   const adminEmail = 'admin';
 
-  // Funções de navegação
+  // Navegação
   const navigateToHome = () => {
     setCurrentScreen('home');
     setIsAuthenticated(false);
@@ -56,7 +57,7 @@ export default function App() {
     setCurrentScreen('home');
   };
 
-  // Renderizar a tela apropriada
+  // Render
   switch (currentScreen) {
     case 'home':
       return (
