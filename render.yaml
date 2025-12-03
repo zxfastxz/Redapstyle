@@ -4,8 +4,12 @@ services:
     name: redapstyle
     env: node
     plan: free # 'free' é ótimo para começar, mas você pode mudar para 'starter' se precisar de mais recursos.
+    rootDir: . # Garante que os comandos rodem a partir da raiz do projeto
     buildCommand: "npm install && npm run build"
     startCommand: "node server.js"
     envVars:
       - key: NODE_VERSION
         value: "20" # Especifica a versão do Node.js para compatibilidade
+      - key: TOTP_SECRET
+        value: "JBSWY3DPEHPK3PXP"
+        generateValue: true # Gera um valor aleatório seguro no primeiro deploy
