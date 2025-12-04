@@ -51,38 +51,42 @@ export function Filters({
       <div className="flex items-end gap-4">
 
         {/* Zona */}
-        <div className="flex-1">
-          <label className="block text-white text-xs mb-1">Zona</label>
-          <Select value={zonaFiltro} onValueChange={onZonaChange}>
-            <SelectTrigger className="w-full h-9 bg-gray-800 border-gray-700 text-white text-sm">
-              <SelectValue placeholder="Selecione a zona" />
-            </SelectTrigger>
-            <SelectContent className="bg-gray-800 border-gray-700">
-              <SelectItem value="Todas">Todas as Zonas</SelectItem>
-              <SelectItem value="Zona Sul">Zona Sul</SelectItem>
-              <SelectItem value="Zona Oeste">Zona Oeste</SelectItem>
-              <SelectItem value="Zona Norte">Zona Norte</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+<div className="flex-1">
+  <label className="block text-white text-xs mb-1">Zona</label>
+  <Select value={zonaFiltro} onValueChange={onZonaChange}>
+    <SelectTrigger className="w-full h-9 bg-gray-800 border-gray-700 text-white text-sm">
+      <SelectValue placeholder="Selecione a zona" />
+    </SelectTrigger>
 
-        {/* Bairro */}
-        <div className="flex-1">
-          <label className="block text-white text-xs mb-1">Bairro</label>
-          <Select value={bairroFiltro} onValueChange={onBairroChange}>
-            <SelectTrigger className="w-full h-9 bg-gray-800 border-gray-700 text-white text-sm">
-              <SelectValue placeholder="Selecione o bairro" />
-            </SelectTrigger>
-            <SelectContent className="bg-gray-800 border-gray-700">
-              <SelectItem value="Todos">Todos os Bairros</SelectItem>
-              {bairrosDisponiveis.sort().map(bairro => (
-                <SelectItem key={bairro} value={bairro}>
-                  {bairro}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+    <SelectContent className="bg-gray-800 border-gray-700 text-white">
+      <SelectItem className="text-white" value="Todas">Todas as Zonas</SelectItem>
+      <SelectItem className="text-white" value="Zona Sul">Zona Sul</SelectItem>
+      <SelectItem className="text-white" value="Zona Oeste">Zona Oeste</SelectItem>
+      <SelectItem className="text-white" value="Zona Norte">Zona Norte</SelectItem>
+    </SelectContent>
+  </Select>
+</div>
+
+{/* Bairro */}
+<div className="flex-1">
+  <label className="block text-white text-xs mb-1">Bairro</label>
+  <Select value={bairroFiltro} onValueChange={onBairroChange}>
+    <SelectTrigger className="w-full h-9 bg-gray-800 border-gray-700 text-white text-sm">
+      <SelectValue placeholder="Selecione o bairro" />
+    </SelectTrigger>
+
+    <SelectContent className="bg-gray-800 border-gray-700 text-white">
+      <SelectItem className="text-white" value="Todos">Todos os Bairros</SelectItem>
+
+      {bairrosDisponiveis.sort().map(bairro => (
+        <SelectItem className="text-white" key={bairro} value={bairro}>
+          {bairro}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+</div>
+
 
       </div>
     </Card>
