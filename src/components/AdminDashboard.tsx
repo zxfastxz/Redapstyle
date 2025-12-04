@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Topbar } from './Topbar';
 import { Map } from './Map';
 import { MapLegend } from './MapLegend';
@@ -50,7 +50,11 @@ interface AdminDashboardProps {
   onLogout: () => void;
 }
 
-const sensoresIniciais = [
+/* ---- Sensores base (posições / nomes) ----
+   Mantemos esses para garantir consistência no mapa e UI,
+   mesmo que o backend retorne dados faltantes.
+*/
+const sensoresIniciais: Omit<Sensor, 'nivelAgua' | 'temperatura' | 'umidade' | 'status'>[] = [
   { id: 1, nome: "Parada Boa Viagem", lat: -8.117, lng: -34.894, bairro: "Boa Viagem" },
   { id: 2, nome: "Parada Derby", lat: -8.052, lng: -34.903, bairro: "Derby" },
   { id: 3, nome: "Parada Afogados", lat: -8.085, lng: -34.917, bairro: "Afogados" },
@@ -67,196 +71,227 @@ const sensoresIniciais = [
   { id: 15, nome: "Parada Boa Vista", lat: -8.056, lng: -34.893, bairro: "Boa Vista" }
 ];
 
-const calcularStatus = (nivelAgua: number): 'Normal' | 'Alerta' | 'Risco' | 'Crítico' => {
-  if (nivelAgua < 10) return 'Normal';
-  if (nivelAgua < 20) return 'Alerta';
-  if (nivelAgua < 30) return 'Risco';
-  return 'Crítico';
-};
-
-const gerarDadosSimulados = (): Omit<Sensor, 'id' | 'nome' | 'lat' | 'lng' | 'bairro'> => {
-  const nivelAgua = Math.floor(Math.random() * 40);
-  const temperatura = 22 + Math.random() * 10;
-  const umidade = 60 + Math.random() * 30;
-  const status = calcularStatus(nivelAgua);
-  
-  return { nivelAgua, temperatura, umidade, status };
-};
+const BACKEND_BASE = 'http://192.168.0.12:5000';
+const SENSORES_ENDPOINT = `${BACKEND_BASE}/sensores`;
 
 export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [sensores, setSensores] = useState<Sensor[]>([]);
   const [historico, setHistorico] = useState<HistoricalData[]>([]);
-  const [simulacaoAtiva, setSimulacaoAtiva] = useState(false);
   const [bairroFiltro, setBairroFiltro] = useState<string>('Todos');
   const [zonaFiltro, setZonaFiltro] = useState<string>('Todas');
   const [dashboardFiltro, setDashboardFiltro] = useState<string>('Geral');
   const [statusFiltro, setStatusFiltro] = useState<string>('Todos');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [alertas, setAlertas] = useState<AlertEvent[]>([]);
-  const [ultimaAtualizacao, setUltimaAtualizacao] = useState<Date>(new Date());
+  const [ultimaAtualizacao, setUltimaAtualizacao] = useState<Date | null>(null);
+  const [erroConexao, setErroConexao] = useState<string | null>(null);
 
-  // Inicializar sensores
+  /* Helper: garante valores defaults se backend não retornar algum campo */
+  const normalizarSensor = (s: Partial<Sensor> & { id: number }): Sensor => {
+    const base = sensoresIniciais.find(b => b.id === s.id);
+    return {
+      id: s.id,
+      nome: s.nome ?? base?.nome ?? `Sensor ${s.id}`,
+      lat: s.lat ?? base?.lat ?? 0,
+      lng: s.lng ?? base?.lng ?? 0,
+      bairro: s.bairro ?? base?.bairro ?? 'Desconhecido',
+      nivelAgua: typeof s.nivelAgua === 'number' ? s.nivelAgua : 0,
+      temperatura: typeof s.temperatura === 'number' ? s.temperatura : 0,
+      umidade: typeof s.umidade === 'number' ? s.umidade : 0,
+      status: (s.status as Sensor['status']) ?? 'Normal'
+    };
+  };
+
+  /* Carregamento inicial: busca os sensores reais do backend */
   useEffect(() => {
-    const sensoresComDados = sensoresIniciais.map(s => ({
-      ...s,
-      ...gerarDadosSimulados()
-    }));
-    setSensores(sensoresComDados);
-    
-    // Adicionar dados históricos iniciais
-    const historicosIniciais: HistoricalData[] = [];
-    sensoresComDados.forEach(sensor => {
-      for (let i = 5; i >= 0; i--) {
-        historicosIniciais.push({
-          timestamp: Date.now() - i * 10000,
-          sensorId: sensor.id,
-          nivelAgua: sensor.nivelAgua + Math.random() * 5 - 2.5,
-          temperatura: sensor.temperatura + Math.random() * 2 - 1,
-          umidade: sensor.umidade + Math.random() * 5 - 2.5,
-          status: sensor.status
+    let mounted = true;
+
+    async function carregarSensores() {
+      try {
+        setErroConexao(null);
+        const res = await fetch(SENSORES_ENDPOINT, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const dados: Partial<Sensor>[] = await res.json();
+
+        const sensoresMap: Sensor[] = sensoresIniciais.map(base => {
+          const encontrado = dados.find(d => d.id === base.id);
+          return normalizarSensor({
+            id: base.id,
+            ...encontrado
+          });
         });
+
+        if (!mounted) return;
+        setSensores(sensoresMap);
+
+        // histórico inicial simples com a leitura atual
+        const histInicial: HistoricalData[] = sensoresMap.map(s => ({
+          timestamp: Date.now(),
+          sensorId: s.id,
+          nivelAgua: s.nivelAgua,
+          temperatura: s.temperatura,
+          umidade: s.umidade,
+          status: s.status
+        }));
+        setHistorico(histInicial);
+        setUltimaAtualizacao(new Date());
+      } catch (err: any) {
+        console.error('Erro ao carregar sensores:', err);
+        if (mounted) setErroConexao(String(err.message ?? err));
       }
-    });
-    setHistorico(historicosIniciais);
+    }
+
+    carregarSensores();
+
+    return () => { mounted = false; };
   }, []);
 
-  // Simulação em tempo real
+  /* Polling em tempo real: atualiza a cada 5s (ajuste se quiser) */
   useEffect(() => {
-    if (!simulacaoAtiva) return;
+    let mounted = true;
+    const intervaloMs = 5000;
 
-    const intervalo = setInterval(() => {
-      setSensores(prev => {
-        const novos = prev.map(s => ({
-          ...s,
-          ...gerarDadosSimulados()
-        }));
-        
-        // Adicionar ao histórico
-        const timestamp = Date.now();
-        const novosHistoricos = novos.map(sensor => ({
-          timestamp,
-          sensorId: sensor.id,
-          nivelAgua: sensor.nivelAgua,
-          temperatura: sensor.temperatura,
-          umidade: sensor.umidade,
-          status: sensor.status
-        }));
-        
-        setHistorico(prev => [...prev, ...novosHistoricos].slice(-60));
-        
-        // Detectar novos alertas
-        novos.forEach(sensor => {
-          const anterior = prev.find(p => p.id === sensor.id);
-          if (sensor.status === 'Crítico' || sensor.status === 'Risco') {
-            if (!anterior || (anterior.status !== 'Crítico' && anterior.status !== 'Risco')) {
+    const intervalo = setInterval(async () => {
+      try {
+        const res = await fetch(SENSORES_ENDPOINT, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const dados: Partial<Sensor>[] = await res.json();
+
+        if (!mounted) return;
+
+        setSensores(prev => {
+          // Atualiza cada sensor baseado nos dados retornados
+          const atualizados = prev.map(base => {
+            const encontrado = dados.find(d => d.id === base.id);
+            return normalizarSensor({
+              id: base.id,
+              ...encontrado
+            });
+          });
+
+          // Atualiza histórico (mantém somente as últimas 200 entradas)
+          const timestamp = Date.now();
+          const novosHistoricos: HistoricalData[] = atualizados.map(s => ({
+            timestamp,
+            sensorId: s.id,
+            nivelAgua: s.nivelAgua,
+            temperatura: s.temperatura,
+            umidade: s.umidade,
+            status: s.status
+          }));
+          setHistorico(prevHist => [...prevHist, ...novosHistoricos].slice(-200));
+
+          // Detectar alertas (entradas para Risco/Crítico a partir de estado anterior)
+          atualizados.forEach(sensor => {
+            const anterior = prev.find(p => p.id === sensor.id);
+            if (!anterior) return;
+            const entrouAlerta = (sensor.status === 'Crítico' || sensor.status === 'Risco')
+              && anterior.status !== sensor.status;
+            if (entrouAlerta) {
               const novoAlerta: AlertEvent = {
                 id: Date.now() + sensor.id,
                 timestamp,
                 sensorId: sensor.id,
                 sensorNome: sensor.nome,
-                status: sensor.status,
+                status: sensor.status as 'Crítico' | 'Risco',
                 nivelAgua: sensor.nivelAgua,
-                message: `${sensor.nome} entrou em estado ${sensor.status.toLowerCase()} com ${sensor.nivelAgua.toFixed(1)}cm`
+                message: `${sensor.nome} entrou em estado ${sensor.status} (${sensor.nivelAgua.toFixed(1)}cm)`
               };
-              setAlertas(prev => [novoAlerta, ...prev].slice(0, 20));
+              setAlertas(prev => [novoAlerta, ...prev].slice(0, 50));
             }
-          }
+          });
+
+          setUltimaAtualizacao(new Date());
+          return atualizados;
         });
-        
-        setUltimaAtualizacao(new Date());
-        
-        return novos;
-      });
-    }, 10000);
 
-    return () => clearInterval(intervalo);
-  }, [simulacaoAtiva]);
+        setErroConexao(null);
+      } catch (err: any) {
+        console.error('Erro no polling de sensores:', err);
+        if (mounted) setErroConexao(String(err.message ?? err));
+      }
+    }, intervaloMs);
 
-  const toggleSimulacao = () => {
-    setSimulacaoAtiva(!simulacaoAtiva);
-  };
+    return () => {
+      mounted = false;
+      clearInterval(intervalo);
+    };
+  }, []);
 
+  /* Exportar CSV dos sensores (dados atuais) */
   const exportarCSV = () => {
-  const headers = [
-    "Sensor",
-    "Bairro",
-    "Nível de Água (cm)",
-    "Temperatura (°C)",
-    "Umidade (%)",
-    "Status",
-    "Data/Hora"
-  ];
+    const headers = [
+      "Sensor",
+      "Bairro",
+      "Nível de Água (cm)",
+      "Temperatura (°C)",
+      "Umidade (%)",
+      "Status",
+      "Data/Hora"
+    ];
 
-  const formatDate = () => {
-    const d = new Date();
-    return d.toLocaleString("pt-BR", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    const formatDate = (t: number) => {
+      const d = new Date(t);
+      return d.toLocaleString("pt-BR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    };
+
+    const escape = (value: any) => {
+      if (value == null) return "";
+      const v = String(value);
+      if (/[;"\n]/.test(v)) {
+        return `"${v.replace(/"/g, '""')}"`;
+      }
+      return v;
+    };
+
+    const rows = sensores.map(s => [
+      s.nome,
+      s.bairro,
+      s.nivelAgua.toFixed(1),
+      s.temperatura.toFixed(1),
+      s.umidade.toFixed(1),
+      s.status,
+      ultimaAtualizacao ? formatDate(ultimaAtualizacao.getTime()) : formatDate(Date.now())
+    ]);
+
+    const csvContent =
+      "\uFEFF" + [headers, ...rows].map(row => row.map(escape).join(";")).join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `redap_dados_${Date.now()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
-  const escape = (value: any) => {
-    if (value == null) return "";
-    const v = String(value);
-    // se tiver ; , " ou quebra de linha → coloca entre aspas
-    if (/[;"\n]/.test(v)) {
-      return `"${v.replace(/"/g, '""')}"`;
-    }
-    return v;
-  };
-
-  const rows = sensores.map(s => [
-    s.nome,
-    s.bairro,
-    s.nivelAgua.toFixed(1),
-    s.temperatura.toFixed(1),
-    s.umidade.toFixed(1),
-    s.status,
-    formatDate(),
-  ]);
-
-  // Montagem com ; e BOM UTF-8 (melhor no Excel)
-  const csvContent =
-    "\uFEFF" +
-    [headers, ...rows]
-      .map(row => row.map(escape).join(";"))
-      .join("\n");
-
-  const blob = new Blob([csvContent], {
-    type: "text/csv;charset=utf-8;",
-  });
-
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `redap_dados_${Date.now()}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-};
-
-  
-  // Aplicar filtros
+  /* Filtros aplicados */
   let sensoresFiltrados = sensores;
-  
+
   if (zonaFiltro !== 'Todas') {
     sensoresFiltrados = sensoresFiltrados.filter(s => getZonaPorBairro(s.bairro) === zonaFiltro);
   }
-  
+
   if (bairroFiltro !== 'Todos') {
     sensoresFiltrados = sensoresFiltrados.filter(s => s.bairro === bairroFiltro);
   }
-  
+
   if (statusFiltro !== 'Todos') {
     sensoresFiltrados = sensoresFiltrados.filter(s => s.status === statusFiltro);
   }
-  
+
   if (searchTerm) {
-    sensoresFiltrados = sensoresFiltrados.filter(s => 
-      s.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.bairro.toLowerCase().includes(searchTerm.toLowerCase())
+    const termo = searchTerm.toLowerCase();
+    sensoresFiltrados = sensoresFiltrados.filter(s =>
+      s.nome.toLowerCase().includes(termo) ||
+      s.bairro.toLowerCase().includes(termo)
     );
   }
 
@@ -269,9 +304,9 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
       <div className="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <Topbar 
-              simulacaoAtiva={simulacaoAtiva}
-              onToggleSimulacao={toggleSimulacao}
+            <Topbar
+              simulacaoAtiva={false} // sem simulação nesta versão
+              onToggleSimulacao={() => { /* noop */ }}
               onExportarCSV={exportarCSV}
             />
             <Button
@@ -285,7 +320,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
           </div>
         </div>
       </div>
-      
+
       {/* Badge Administrativo */}
       <div className="bg-blue-900/20 border-b border-blue-800/30">
         <div className="container mx-auto px-4 py-2">
@@ -296,10 +331,17 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
       </div>
 
       {temCriticos && <AlertBanner sensores={sensores} />}
-      
+
       <div className="container mx-auto p-4 pb-8">
+        {/* Se houve erro de conexão, exibir banner simples */}
+        {erroConexao && (
+          <div className="mb-4 p-3 bg-red-900/30 border border-red-800 text-red-200 rounded">
+            Erro ao conectar com o backend: {erroConexao}
+          </div>
+        )}
+
         {/* Filtros Principais */}
-        <Filters 
+        <Filters
           zonaFiltro={zonaFiltro}
           onZonaChange={setZonaFiltro}
           bairroFiltro={bairroFiltro}
@@ -307,7 +349,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
           dashboardFiltro={dashboardFiltro}
           onDashboardChange={setDashboardFiltro}
         />
-        
+
         {/* Busca */}
         <div className="mb-6">
           <div className="relative">
@@ -326,43 +368,43 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
           <div className="lg:col-span-2 space-y-6">
             <Map sensores={sensoresFiltrados} />
             <MapLegend />
-            
+
             {mostrarCards && <SensorCards sensores={sensoresFiltrados} />}
-            
+
             <Tabs defaultValue="overview" className="w-full">
               <TabsList className="bg-gray-900 border border-gray-800 w-full justify-start">
-                <TabsTrigger 
-                  value="overview" 
+                <TabsTrigger
+                  value="overview"
                   className="text-white data-[state=active]:bg-black data-[state=active]:text-white"
                 >
                   Visão Geral
                 </TabsTrigger>
-                <TabsTrigger 
+                <TabsTrigger
                   value="charts"
                   className="text-white data-[state=active]:bg-black data-[state=active]:text-white"
                 >
                   Gráficos
                 </TabsTrigger>
-                <TabsTrigger 
+                <TabsTrigger
                   value="history"
                   className="text-white data-[state=active]:bg-black data-[state=active]:text-white"
                 >
                   Histórico de Alertas
                 </TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="overview" className="mt-4">
-                <Statistics 
-                  sensores={sensores} 
-                  ultimaAtualizacao={ultimaAtualizacao}
-                  simulacaoAtiva={simulacaoAtiva}
+                <Statistics
+                  sensores={sensores}
+                  ultimaAtualizacao={ultimaAtualizacao ?? new Date()}
+                  simulacaoAtiva={false}
                 />
               </TabsContent>
-              
+
               <TabsContent value="charts" className="mt-4">
                 <Charts sensores={sensores} historico={historico} />
               </TabsContent>
-              
+
               <TabsContent value="history" className="mt-4">
                 <AlertHistory alertas={alertas} />
               </TabsContent>
@@ -371,8 +413,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
           {/* Coluna Direita - 1/3 */}
           <div className="space-y-6">
-            <Indicators 
-              sensores={sensores} 
+            <Indicators
+              sensores={sensores}
               onStatusClick={(status) => {
                 setStatusFiltro(status === statusFiltro ? 'Todos' : status);
                 setBairroFiltro('Todos');
@@ -380,16 +422,16 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
               }}
               statusAtivo={statusFiltro}
             />
-            
+
             <WazeTrafficMap />
           </div>
         </div>
       </div>
-      
+
       {/* Footer */}
       <footer className="bg-[#1A1A1A] py-6 mt-8">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-white text-sm">© 2025 Sistema de Monitoramento – Todos os direitos reservados.</p>
+          <p className="text-white text-sm">© {new Date().getFullYear()} Sistema de Monitoramento – Todos os direitos reservados.</p>
         </div>
       </footer>
     </div>
